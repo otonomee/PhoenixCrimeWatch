@@ -1,0 +1,36 @@
+from flask import jsonify
+from app import app, db
+from app.models.crime import Crime
+import requests
+
+@app.route('/fetch-data')
+def fetch_data():
+    api_url = "https://www.phoenixopendata.com/api/3/action/datastore_search?resource_id=0ce3411a-2fc6-4302-a33f-167f68608a20"
+    response = requests.get(api_url)
+    data = response.json()
+
+    records = data['result']['records']
+
+    for record in records:
+        crime = Crime(_id=record['_id'], inc_number=record['INC NUMBER'], occurred_on=record['OCCURRED ON'],
+                      occurred_to=record['OCCURRED TO'], ucr_crime_category=record['UCR CRIME CATEGORY'],
+                      block_addr=record['100 BLOCK ADDR'], zip=record['ZIP'], premise_type=record['PREMISE TYPE'],
+                      grid=record['GRID'])
+        db.session.add(crime)
+
+    db.session.commit()
+    return jsonify({'message': 'Data fetched and stored successfully'})
+
+@app.route('/crimes')
+def get_crimes():
+    crimes = Crime.query.all()
+    return jsonify([{
+        '_id': crime._id,
+        'inc_number': crime.inc_number,
+        'occurred_on': crime.occurred_on,
+        'crime_category': crime.ucr_crime_category,
+        'block_addr': crime.block_addr,
+        'zip': crime.zip,
+        'premise_type': crime.premise_type,
+        'grid': crime.grid
+    } for crime in crimes])
