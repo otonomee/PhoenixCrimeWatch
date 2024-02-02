@@ -64,6 +64,7 @@ const CrimeByLocationType = () => {
       .innerRadius(radius - 80);
 
     const arc = g.selectAll(".arc").data(pie(pieData)).enter().append("g").attr("class", "arc");
+
     const lineStartArc = d3
       .arc()
       .innerRadius(radius * 0.95) // Make the lineStartArc slightly larger than the radius
@@ -108,7 +109,26 @@ const CrimeByLocationType = () => {
       .style("font-size", "25px")
       .style("font-weight", "bold")
       .style("fill", (d) => color(d.data.premise_type)); // Color the label with the color of the slice
-
+    arc
+      .append("path")
+      .attr("d", path)
+      .attr("fill", (d) => color(d.data.premise_type))
+      .on("mouseover", (event, d) => {
+        console.log("mouseover triggered");
+        const [x, y] = d3.pointer(event);
+        const svgRect = ref.current.getBoundingClientRect();
+        setTooltip({
+          x: x + svgRect.left,
+          y: y + svgRect.top,
+          visible: true,
+          text: Object.entries(d.data.categories)
+            .map(([category, count]) => `${category}: ${count}`)
+            .join(", "),
+        });
+      })
+      .on("mouseout", () => {
+        setTooltip({ ...tooltip, visible: false });
+      });
     const legendItemWidth = d3.max(pieData, (d) => d.premise_type.length) * 6 + 90; // Increase the width of each legend item
 
     const numPerRow = Math.floor(width / legendItemWidth); // Number of items per row
@@ -159,22 +179,26 @@ const CrimeByLocationType = () => {
   return (
     <div>
       <h3 className="metric-header">Top 10 Crime Locations By Count</h3>
-      <svg ref={ref}></svg>
-      {tooltip.visible && (
-        <div
-          className="tooltip"
-          style={{
-            position: "absolute",
-            left: tooltip.x + "px",
-            top: tooltip.y + "px",
-            opacity: tooltip.visible ? 0.9 : 0,
-          }}
-        >
-          {tooltip.text}
-        </div>
-      )}
+      <div style={{ position: "relative" }}>
+        <svg ref={ref}></svg>
+        {tooltip.visible && (
+          <div
+            className="tooltip"
+            style={{
+              position: "absolute",
+              left: tooltip.x + "px",
+              top: tooltip.y + "px",
+              opacity: tooltip.visible ? 0.9 : 0,
+              backgroundColor: "white", // Add this line
+              border: "solid 1px black", // Add this line
+              padding: "10px", // Add this line
+            }}
+          >
+            {tooltip.text}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
-
 export default CrimeByLocationType;
