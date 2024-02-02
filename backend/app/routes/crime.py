@@ -29,11 +29,13 @@ def get_crimes():
         '_id': crime._id,
         'inc_number': crime.inc_number,
         'occurred_on': crime.occurred_on,
-        'crime_category': crime.ucr_crime_category,
+        'ucr_crime_category': crime.ucr_crime_category,  # corrected key
         'block_addr': crime.block_addr,
         'zip': crime.zip,
         'premise_type': crime.premise_type,
-        'grid': crime.grid
+        'grid': crime.grid,
+        'latitude': crime.latitude,  # added latitude
+        'longitude': crime.longitude  # added longitude
     } for crime in crimes])
 
     import csv

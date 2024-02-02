@@ -1,26 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import axios from "axios";
 
-const BarChart = () => {
-  const [data, setData] = useState([]);
+const BarChart = ({ data, xField, yField }) => {
   const ref = useRef();
-
-  useEffect(() => {
-    axios.get("http://localhost:3000/crimes").then((response) => {
-      const crimeCounts = response.data.reduce((acc, curr) => {
-        acc[curr.crime_category] = (acc[curr.crime_category] || 0) + 1;
-        return acc;
-      }, {});
-
-      const transformedData = Object.entries(crimeCounts).map(([crime_category, count]) => ({
-        crime_category,
-        count,
-      }));
-
-      setData(transformedData);
-    });
-  }, []);
 
   useEffect(() => {
     if (data.length === 0) return;
@@ -39,8 +21,8 @@ const BarChart = () => {
     const xScale = d3.scaleBand().range([0, width]).padding(0.1);
     const yScale = d3.scaleLinear().range([height, 0]);
 
-    xScale.domain(data.map((d) => d.crime_category));
-    yScale.domain([0, d3.max(data, (d) => d.count)]);
+    xScale.domain(data.map((d) => d[xField]));
+    yScale.domain([0, d3.max(data, (d) => d[yField])]);
 
     svg
       .append("g")
@@ -57,21 +39,21 @@ const BarChart = () => {
     bars
       .append("rect")
       .attr("class", "bar")
-      .attr("x", (d) => xScale(d.crime_category))
+      .attr("x", (d) => xScale(d[xField]))
       .attr("width", xScale.bandwidth())
-      .attr("y", (d) => yScale(d.count))
-      .attr("height", (d) => height - yScale(d.count))
+      .attr("y", (d) => yScale(d[yField]))
+      .attr("height", (d) => height - yScale(d[yField]))
       .attr("fill", "#69b3a2");
 
     bars
       .append("text")
-      .attr("x", (d) => xScale(d.crime_category) + xScale.bandwidth() / 2)
-      .attr("y", (d) => yScale(d.count) - 5)
+      .attr("x", (d) => xScale(d[xField]) + xScale.bandwidth() / 2)
+      .attr("y", (d) => yScale(d[yField]) - 5)
       .attr("text-anchor", "middle")
-      .text((d) => d.count);
+      .text((d) => d[yField]);
 
-    bars.append("title").text((d) => `Crime Category: ${d.crime_category}\nCount: ${d.count}`);
-  }, [data]);
+    bars.append("title").text((d) => `${xField}: ${d[xField]}\n${yField}: ${d[yField]}`);
+  }, [data, xField, yField]);
 
   return <svg ref={ref}></svg>;
 };

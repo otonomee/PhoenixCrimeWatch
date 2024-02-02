@@ -36,3 +36,29 @@
     transform: rotate(360deg);
   }
 }
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  padding: 8px;
+  font: 12px sans-serif;
+  background: white; /* Set white background */
+  border: 1px solid #ccc; /* Add a border for visibility */
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 999; /* Ensure it's on top of other elements */
+  position: absolute;
+  opacity: 0.9;
+  padding: 19px;
+  background: black;
+  color: white;
+  font-weight: 500;
+  font-size: 22px;
+  border-radius: 19px;
+}
+
+/* Additional styling as needed */
+
+/* Additional styling as needed */

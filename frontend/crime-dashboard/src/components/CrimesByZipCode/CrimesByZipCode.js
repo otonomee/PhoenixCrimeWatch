@@ -1,67 +1,120 @@
-// CrimesByZipCode.js
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import axios from "axios";
+import { useYear } from "../../contexts/YearContext.js";
+import { useCrimeData } from "../../contexts/CrimeDataContext.js";
 
 const CrimesByZipCode = () => {
-  const [data, setData] = useState([]);
+  const { year } = useYear();
+  const { crimeData } = useCrimeData();
   const ref = useRef();
+  const [tooltip, setTooltip] = useState({ x: 0, y: 0, visible: false, text: "" });
 
   useEffect(() => {
-    axios.get("http://localhost:3000/crimes").then((response) => {
-      const zipCounts = response.data.reduce((acc, curr) => {
-        acc[curr.zip] = (acc[curr.zip] || 0) + 1;
-        return acc;
-      }, {});
-
-      const transformedData = Object.entries(zipCounts).map(([zip, count]) => ({
-        zip,
-        count,
-      }));
-
-      setData(transformedData);
+    const filteredData = crimeData.filter((crime) => {
+      const crimeYear = new Date(crime.occurred_on).getFullYear().toString();
+      return crimeYear === year;
     });
-  }, []);
 
-  useEffect(() => {
-    if (data.length === 0) return;
+    const zipCounts = filteredData.reduce((acc, crime) => {
+      acc[crime.zip] = acc[crime.zip] || { total: 0, categories: {} };
+      acc[crime.zip].total += 1;
+      acc[crime.zip].categories[crime.ucr_crime_category] = (acc[crime.zip].categories[crime.ucr_crime_category] || 0) + 1;
+      return acc;
+    }, {});
 
-    const width = 450;
-    const height = 450;
-    const margin = 40;
+    console.log(zipCounts);
 
-    const radius = Math.min(width, height) / 2 - margin;
+    const sortedZipCounts = Object.entries(zipCounts)
+      .sort((a, b) => b[1].total - a[1].total)
+      .slice(0, 10);
 
-    const svg = d3
-      .select(ref.current)
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const pieData = sortedZipCounts.map(([zip, { total, categories }]) => ({
+      zip,
+      total,
+      categories,
+    }));
 
-    const color = d3
-      .scaleOrdinal()
-      .domain(data.map((d) => d.zip))
-      .range(d3.schemeSet3);
+    // Setup the SVG
+    d3.select(ref.current).selectAll("*").remove(); // Clear previous SVG content
+    const svg = d3.select(ref.current),
+      width = 400,
+      height = 400,
+      radius = Math.min(width, height) / 2;
 
-    const pie = d3.pie().value((d) => d.count);
-    const data_ready = pie(data);
+    svg.attr("width", width).attr("height", height);
 
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
+    const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    svg
-      .selectAll("pieces")
-      .data(data_ready)
-      .enter()
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const pie = d3.pie().value((d) => d.total);
+
+    const path = d3.arc().outerRadius(radius).innerRadius(0);
+    const label = d3
+      .arc()
+      .outerRadius(radius)
+      .innerRadius(radius - 80);
+
+    const arcs = g.selectAll(".arc").data(pie(pieData)).enter().append("g").attr("class", "arc");
+
+    arcs
       .append("path")
-      .attr("d", arc)
+      .attr("d", path)
       .attr("fill", (d) => color(d.data.zip));
-  }, [data]);
+
+    arcs
+      .append("text")
+      .attr("transform", (d) => `translate(${label.centroid(d)})`)
+      .attr("text-anchor", "middle")
+      .text((d) => d.data.zip)
+      .style("font-size", "18px") // Increased size
+      .style("font-weight", "bold") // Bold font
+      .attr("fill", "white"); // Change as needed
+
+    // Add a custom tooltip using div elements
+    arcs
+      .on("mouseenter", (event, d) => {
+        setTooltip({
+          x: event.pageX,
+          y: event.pageY - 28,
+          visible: true,
+          text: (
+            <div>
+              <p>Zip: {d.data.zip}</p>
+              <p>Total: {d.data.total}</p>
+              {d.data.categories &&
+                typeof d.data.categories === "object" &&
+                Object.entries(d.data.categories).map(([category, count]) => (
+                  <p key={category}>
+                    {category}: {count}
+                  </p>
+                ))}
+            </div>
+          ),
+        });
+      })
+      .on("mouseleave", () => {
+        setTooltip({ ...tooltip, visible: false });
+      });
+  }, [crimeData, year, tooltip]);
 
   return (
     <div>
-      <h2>Crimes by Zip Code</h2>
+      <h3>Top 10 Zip Codes (Crime Counts) {year}</h3>
       <svg ref={ref}></svg>
+      {tooltip.visible && (
+        <div
+          className="tooltip"
+          style={{
+            position: "absolute",
+            left: tooltip.x + "px",
+            top: tooltip.y + "px",
+            opacity: tooltip.visible ? 0.9 : 0,
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
     </div>
   );
 };
