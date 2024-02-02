@@ -5,6 +5,7 @@ const BarChart = ({ data, xField, yField }) => {
   const ref = useRef();
 
   useEffect(() => {
+    d3.select(ref.current).selectAll("*").remove();
     if (data.length === 0) return;
 
     const margin = { top: 20, right: 20, bottom: 30, left: 40 };
@@ -18,19 +19,20 @@ const BarChart = ({ data, xField, yField }) => {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const xScale = d3.scaleBand().range([0, width]).padding(0.1);
+    const xScale = d3
+      .scaleBand()
+      .domain(data.map((d) => new Date(0, 0, 0, d[xField], 0, 0)))
+      .range([0, width])
+      .padding(0.1);
+
+    const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%I %p"));
+
     const yScale = d3.scaleLinear().range([height, 0]);
 
-    xScale.domain(data.map((d) => d[xField]));
+    xScale.domain(data.map((d) => new Date(0, 0, 0, d[xField], 0, 0)));
     yScale.domain([0, d3.max(data, (d) => d[yField])]);
 
-    svg
-      .append("g")
-      .attr("transform", `translate(0,${height})`)
-      .call(d3.axisBottom(xScale))
-      .selectAll("text")
-      .attr("transform", "translate(-10,0)rotate(-45)")
-      .style("text-anchor", "end");
+    svg.append("g").attr("transform", `translate(0, ${height})`).call(xAxis).selectAll("text").style("font-size", "20px"); // Increase the font size
 
     svg.append("g").call(d3.axisLeft(yScale).tickFormat(d3.format("~s")));
 
@@ -39,15 +41,15 @@ const BarChart = ({ data, xField, yField }) => {
     bars
       .append("rect")
       .attr("class", "bar")
-      .attr("x", (d) => xScale(d[xField]))
-      .attr("width", xScale.bandwidth())
+      .attr("x", (d) => xScale(new Date(0, 0, 0, d[xField], 0, 0)))
+      .attr("width", width / 24)
       .attr("y", (d) => yScale(d[yField]))
       .attr("height", (d) => height - yScale(d[yField]))
       .attr("fill", "#69b3a2");
 
     bars
       .append("text")
-      .attr("x", (d) => xScale(d[xField]) + xScale.bandwidth() / 2)
+      .attr("x", (d) => xScale(new Date(0, 0, 0, d[xField], 0, 0)) + width / 48)
       .attr("y", (d) => yScale(d[yField]) - 5)
       .attr("text-anchor", "middle")
       .text((d) => d[yField]);

@@ -32,7 +32,7 @@ import csv
 # ...
 
 # Open the CSV file for writing
-with open(output_csv_file, 'w', newline='') as f:
+with open(output_csv_file, 'a', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(df.columns.tolist())  # Write the header
 

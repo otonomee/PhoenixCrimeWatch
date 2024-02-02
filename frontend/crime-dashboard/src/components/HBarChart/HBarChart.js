@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
-const HBarChart = ({ data, xField, yField, height = 800 }) => {
+const HBarChart = ({ data, xField, yField, height = 400 }) => {
   const ref = useRef();
 
   useEffect(() => {
@@ -9,7 +9,7 @@ const HBarChart = ({ data, xField, yField, height = 800 }) => {
     svgOld.selectAll("*").remove();
     if (data.length === 0) return;
 
-    const margin = { top: 20, right: 20, bottom: 30, left: 250 };
+    const margin = { top: 20, right: 20, bottom: 30, left: 75 };
     const width = 1000 - margin.left - margin.right;
 
     const svg = d3
@@ -17,10 +17,21 @@ const HBarChart = ({ data, xField, yField, height = 800 }) => {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
-      .attr("transform", `translate(${margin.left + 150},${margin.top})`);
+      .attr("transform", `translate(${margin.left + 1},${margin.top})`);
 
-    const xScale = d3.scaleLinear().range([0, width]);
-    const yScale = d3.scaleBand().range([0, height]).padding(0.05);
+    const xScale = d3.scaleLinear().range([0, width * 0.9]); // Reduce maximum value of range to 90% of width
+    // ... existing code ...
+
+    // ... existing code ...
+
+    const yScale = d3
+      .scaleBand()
+      .range([0, height * 0.8])
+      .padding(0.1); // Reduce maximum value of range to 80% of height
+
+    // ... existing code ...
+
+    // ... existing code ...
 
     xScale.domain([0, d3.max(data, (d) => d[xField])]);
     yScale.domain(data.map((d) => d[yField]));
@@ -45,7 +56,7 @@ const HBarChart = ({ data, xField, yField, height = 800 }) => {
     bars
       .append("text")
       .attr("y", (d) => yScale(d[yField]) + yScale.bandwidth() / 2)
-      .attr("x", (d) => xScale(d[xField]) + 5)
+      .attr("x", (d) => xScale(d[xField]) + 15)
       .attr("dy", ".35em")
       .text((d) => d[xField]);
 

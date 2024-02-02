@@ -25,8 +25,8 @@ const MostCommonCrime = () => {
 
   return (
     <div>
-      <h3>Most Common Crime in {year}</h3>
-      <p>{mostCommon || "No data available"}</p>
+      <h3 className="metric-header">Most Common Crime in {year}</h3>
+      <p style={{ fontSize: "48px" }}>{mostCommon || "No data available"}</p>
     </div>
   );
 };

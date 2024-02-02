@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import BarChart from "../BarChart/BarChart.js"; // Create a BarChart component for displaying the breakdown
+import LineChart from "../LineChart/LineChart.js"; // Create a BarChart component for displaying the breakdown
 import { useYear } from "../../contexts/YearContext";
 import { useCrimeData } from "../../contexts/CrimeDataContext";
 
@@ -37,7 +38,7 @@ const CrimeByDayOrTime = () => {
       const counts = Object.values(dayHourCounts).map((day) => day[hour] || 0);
       const total = counts.reduce((a, b) => a + b, 0);
       const average = total / counts.length;
-      return { hour, count: average };
+      return { hour: hour, count: Number(average.toFixed(1)) }; // Round to 1 decimal place
     });
 
     setDayOrTimeData(averageHourCounts);
@@ -47,8 +48,8 @@ const CrimeByDayOrTime = () => {
 
   return (
     <div className="metric-container">
-      <h3>Crime by Day of the Week or Time of Day</h3>
-      <BarChart data={dayOrTimeData} xField="hour" yField="count" />
+      <h3 className="metric-header">Crime Average Count by Time of Day</h3>
+      <LineChart data={dayOrTimeData} xField="hour" yField="count" />
     </div>
   );
 };

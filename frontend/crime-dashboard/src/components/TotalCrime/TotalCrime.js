@@ -54,8 +54,8 @@ const TotalCrimes = () => {
 
   return (
     <div>
-      <h3>Total Crimes in {year}</h3>
-      <p>{total}</p>
+      <h3 className="metric-header">Total Crimes in {year}</h3>
+      <p style={{ fontSize: "48px" }}>{total}</p>
     </div>
   );
 };
