@@ -1,5 +1,6 @@
 from flask import jsonify
 from app import app, db
+import csv
 from app.models.crime import Crime
 import requests
 
@@ -34,3 +35,19 @@ def get_crimes():
         'premise_type': crime.premise_type,
         'grid': crime.grid
     } for crime in crimes])
+
+    import csv
+
+@app.route('/import-data')
+def import_data():
+    with open('data.csv', 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            crime = Crime(_id=row['\ufeff_id'], inc_number=row['INC NUMBER'], occurred_on=row['OCCURRED ON'],
+                          occurred_to=row['OCCURRED TO'], ucr_crime_category=row['UCR CRIME CATEGORY'],
+                          block_addr=row['100 BLOCK ADDR'], zip=row['ZIP'], premise_type=row['PREMISE TYPE'],
+                          grid=row['GRID'])
+            db.session.add(crime)
+
+    db.session.commit()
+    return jsonify({'message': 'Data imported and stored successfully'})
