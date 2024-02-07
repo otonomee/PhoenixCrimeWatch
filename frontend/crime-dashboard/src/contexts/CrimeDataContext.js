@@ -19,7 +19,7 @@ export const CrimeDataProvider = ({ children }) => {
       //   setIsLoading(false);
       // } else {
       try {
-        const response = await axios.get("http://localhost:3000/crimes");
+        const response = await axios.get("https://crime-dashboard-api-5fc16ed78a07.herokuapp.com/crimes");
         console.log("API response:", response.data); // Add this line
         // localStorage.setItem("crimeData", JSON.stringify(response.data));
         setCrimeData(response.data);
