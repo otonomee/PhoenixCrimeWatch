@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import HBarChart from "../HBarChart/HBarChart.js";
-import { useYear } from "../../contexts/YearContext.js";
 import { useCrimeData } from "../../contexts/CrimeDataContext.js";
 
 const CrimesByZipCode = () => {
   const [zipData, setZipData] = useState([]);
-  const { year } = useYear();
   const { crimeData } = useCrimeData();
 
   useEffect(() => {
+    const year = "2023"; // Set year to 2023
     const filteredData = crimeData.filter((crime) => {
       const crimeYear = new Date(crime.occurred_on).getFullYear().toString();
       return crimeYear === year;
@@ -26,7 +25,7 @@ const CrimesByZipCode = () => {
       .slice(0, 10);
 
     setZipData(sortedZipCounts);
-  }, [crimeData, year]);
+  }, [crimeData]);
 
   return (
     <div className="metric-container">

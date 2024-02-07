@@ -4,6 +4,9 @@ import csv
 from app.models.crime import Crime
 import requests
 from datetime import datetime, timedelta  # import datetime and timedelta
+from flask import jsonify, request
+from app import app
+from app.models.crime import Crime
 
 @app.route('/fetch-data')
 def fetch_data():
@@ -23,25 +26,28 @@ def fetch_data():
     db.session.commit()
     return jsonify({'message': 'Data fetched and stored successfully'})
 
+
 @app.route('/crimes')
 def get_crimes():
-    three_years_ago = datetime.now() - timedelta(days=3*365)  # calculate the date 3 years ago
-    crimes = Crime.query.filter(Crime.occurred_on >= three_years_ago).all()  # filter crimes
+    year = request.args.get('year', default=2023, type=int)  # Get the year query parameter
+    crimes = Crime.query.all()  # Get all crimes
+
+    # Filter crimes by year
+    crimes = [crime for crime in crimes if crime.occurred_on and datetime.strptime(crime.occurred_on, "%m/%d/%Y %H:%M").year == year]
+
     return jsonify([{
         '_id': crime._id,
         'inc_number': crime.inc_number,
         'occurred_on': crime.occurred_on,
-        'ucr_crime_category': crime.ucr_crime_category,  # corrected key
+        'ucr_crime_category': crime.ucr_crime_category,
         'block_addr': crime.block_addr,
         'zip': crime.zip,
         'premise_type': crime.premise_type,
         'grid': crime.grid,
-        'latitude': crime.latitude,  # added latitude
-        'longitude': crime.longitude  # added longitude
+        'latitude': crime.latitude,
+        'longitude': crime.longitude
     } for crime in crimes])
-
-    import csv
-
+    
 @app.route('/import-data')
 def import_data():
     with open('data.csv', 'r') as f:

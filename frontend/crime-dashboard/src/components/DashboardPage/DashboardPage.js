@@ -15,8 +15,8 @@ import "./DashboardPage.css"; // Import your CSS file for styling
 const DashboardPage = () => {
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">Crime Dashboard</h1>
-      <YearSelector />
+      <h1 className="dashboard-title">Phoenix Crime Dashboard - 2023</h1>
+      {/* <YearSelector /> */}
       <div className="dashboard-grid">
         <div style={{ display: "flex", flexDirection: "row", width: "100%", gap: "25px", height: "675px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "25px", flex: ".35" }}>

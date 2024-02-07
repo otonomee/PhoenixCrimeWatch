@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import BarChart from "../BarChart/BarChart.js"; // Create a BarChart component for displaying the breakdown
-import DayOfWeekLineChart from "../DayOfWeekLineChart/DayOfWeekLineChart.js"; // Create a BarChart component for displaying the breakdown
-import { useYear } from "../../contexts/YearContext";
+import BarChart from "../BarChart/BarChart.js";
+import DayOfWeekLineChart from "../DayOfWeekLineChart/DayOfWeekLineChart.js";
 import { useCrimeData } from "../../contexts/CrimeDataContext";
 
 const CrimeByDayOrTime = () => {
   const [dayOrTimeData, setDayOrTimeData] = useState([]);
-  const { year } = useYear();
   const { crimeData } = useCrimeData();
 
   // ...
 
   useEffect(() => {
+    const year = "2023"; // Set year to 2023
+
     // Filter and aggregate data based on your requirements
     const filteredData = crimeData.filter((crime) => {
       const crimeYear = new Date(crime.occurred_on).getFullYear().toString();
@@ -38,7 +38,7 @@ const CrimeByDayOrTime = () => {
     });
 
     setDayOrTimeData(averageDayCounts);
-  }, [crimeData, year]);
+  }, [crimeData]);
 
   // ...
 

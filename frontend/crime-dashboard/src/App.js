@@ -9,12 +9,12 @@ import "./App.css";
 
 function App() {
   return (
-    <YearProvider>
-      <CrimeDataProvider>
-        <DashboardPage />
-        {/* other components */}
-      </CrimeDataProvider>
-    </YearProvider>
+    // <YearProvider>
+    <CrimeDataProvider>
+      <DashboardPage />
+      {/* other components */}
+    </CrimeDataProvider>
+    // </YearProvider>
   );
 }
 

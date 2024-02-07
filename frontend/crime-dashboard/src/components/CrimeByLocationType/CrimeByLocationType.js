@@ -1,17 +1,16 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import { useYear } from "../../contexts/YearContext.js";
 import { useCrimeData } from "../../contexts/CrimeDataContext.js";
 import moment from "moment";
 
 const CrimeByLocationType = () => {
-  const { year } = useYear();
   const { crimeData } = useCrimeData();
   const ref = useRef();
   const [tooltip, setTooltip] = useState({ x: 0, y: 0, visible: false, text: "" });
 
   useEffect(() => {
     d3.select(ref.current).selectAll("*").remove();
+    const year = "2023"; // Set year to 2023
     const filteredData = crimeData.filter((crime) => {
       const crimeDate = moment(crime.occurred_on, "MM/DD/YYYY HH:mm");
       const crimeYear = crimeDate.year().toString();
@@ -174,7 +173,7 @@ const CrimeByLocationType = () => {
       .style("text-anchor", "start")
       .style("font-size", "25px")
       .style("padding", "5px");
-  }, [crimeData, year]);
+  }, [crimeData]);
 
   return (
     <div>

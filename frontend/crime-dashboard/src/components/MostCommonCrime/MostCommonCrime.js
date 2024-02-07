@@ -1,11 +1,10 @@
 // MostCommonCrime.js
 import React, { useState, useEffect } from "react";
-import { useYear } from "../../contexts/YearContext.js";
 import { useCrimeData } from "../../contexts/CrimeDataContext.js";
 
 const MostCommonCrime = () => {
   const [mostCommon, setMostCommon] = useState("");
-  const { year } = useYear();
+  const year = "2023"; // Set year to 2023
   const { crimeData } = useCrimeData();
 
   useEffect(() => {
@@ -21,7 +20,7 @@ const MostCommonCrime = () => {
 
     const mostCommonCrime = Object.entries(crimeCounts).reduce((a, b) => (a[1] > b[1] ? a : b), ["", 0])[0];
     setMostCommon(mostCommonCrime);
-  }, [crimeData, year]);
+  }, [crimeData]);
 
   return (
     <div>

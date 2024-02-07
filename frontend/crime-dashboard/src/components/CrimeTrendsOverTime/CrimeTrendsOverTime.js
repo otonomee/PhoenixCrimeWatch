@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import LineChart from "../LineChart/LineChart.js"; // Create a LineChart component for displaying the trend
-import { useYear } from "../../contexts/YearContext.js";
 import { useCrimeData } from "../../contexts/CrimeDataContext.js";
 
 const CrimeTrendsOverTime = () => {
   const [trendsOverTimeData, setTrendsOverTimeData] = useState([]);
-  const { year } = useYear();
   const { crimeData } = useCrimeData();
 
   useEffect(() => {
+    const year = "2023"; // Set year to 2023
     // Filter and aggregate data based on your requirements
     const filteredData = crimeData.filter((crime) => {
       const crimeYear = new Date(crime.occurred_on).getFullYear().toString();
@@ -26,7 +25,7 @@ const CrimeTrendsOverTime = () => {
     }, {});
 
     setTrendsOverTimeData(Object.entries(monthlyData).map(([month, count]) => ({ month, count })));
-  }, [crimeData, year]);
+  }, [crimeData]);
 
   return (
     <div className="metric-container">
