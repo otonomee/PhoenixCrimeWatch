@@ -3,6 +3,7 @@ from app import app, db
 import csv
 from app.models.crime import Crime
 import requests
+from datetime import datetime, timedelta  # import datetime and timedelta
 
 @app.route('/fetch-data')
 def fetch_data():
@@ -24,7 +25,8 @@ def fetch_data():
 
 @app.route('/crimes')
 def get_crimes():
-    crimes = Crime.query.all()
+    three_years_ago = datetime.now() - timedelta(days=3*365)  # calculate the date 3 years ago
+    crimes = Crime.query.filter(Crime.occurred_on >= three_years_ago).all()  # filter crimes
     return jsonify([{
         '_id': crime._id,
         'inc_number': crime.inc_number,

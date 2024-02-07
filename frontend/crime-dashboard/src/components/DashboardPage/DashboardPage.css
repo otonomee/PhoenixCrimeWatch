@@ -6,9 +6,9 @@
 }
 
 .dashboard-title {
-  text-align: center;
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 36px; /* Increase font size */
+  padding: 20px; /* Add some padding */
+  /* Add any other styles you want */
 }
 
 .dashboard-grid {

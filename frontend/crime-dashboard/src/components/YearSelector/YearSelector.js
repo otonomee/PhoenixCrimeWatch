@@ -1,6 +1,7 @@
-// Part of DashboardPage.js or in its own file, e.g., components/YearSelector.js
+// YearSelector.js
 import React from "react";
 import { useYear } from "../../contexts/YearContext.js"; // Adjust the import path based on your structure
+import "./YearSelector.css"; // Import the CSS file
 
 const YearSelector = () => {
   const { year, setYear } = useYear();
